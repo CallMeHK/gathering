@@ -1,0 +1,40 @@
+<div>
+    <h1>Welcome to Home</h1>
+    <div>Click the button below to generate a page</div>
+    <br>
+    <br>
+    <div>
+        <button type="submit"
+         id='gen-btn'
+         onclick='generateSession()'
+         >
+            Generate Session
+        </button>
+        <div id='message'></div>
+    </div>
+    <script>
+        function $elt(elt){
+            return document.querySelector(elt)
+        }
+        function generateSession(){
+            $elt('#gen-btn').setAttribute("disabled", true)
+            $elt('#gen-btn').innerText="Generating Session..."
+            fetch('/api/generate')
+                .then(function(res){return res.json()})
+                .then(function(json){
+                    if(json.success) {
+                        window.location.href = '/session/' + json.data.session
+                    } else {
+                        $elt('#gen-btn').removeAttribute("disabled")
+                        $elt('#gen-btn').innerText="Generate Session"
+                        $elt('#message').innerText="Could not create session, please try again"
+                    }
+                })
+                .catch(e => {
+                    $elt('#gen-btn').removeAttribute("disabled")
+                    $elt('#gen-btn').innerText="Generate Session"
+                    $elt('#message').innerText="Could not create session, please try again"
+                })
+        } 
+    </script>
+</div>

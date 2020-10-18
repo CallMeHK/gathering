@@ -17,13 +17,17 @@ defmodule GatheringWeb.Router do
   scope "/", GatheringWeb do
     pipe_through :browser
 
-    live "/", PageLive, :index
+    get "/", HomeController, :index
+
+    live "/session/:session", RoomLive #, :index
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", GatheringWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", GatheringWeb do
+    pipe_through :api
+
+    resources "/generate", GenerateSessionAPIController
+  end
 
   # Enables LiveDashboard only for development
   #
