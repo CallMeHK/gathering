@@ -4,33 +4,16 @@ defmodule GatheringWeb.NotesLiveComponent do
   alias Gathering.Notes
 
 
-  # def handle_params(_,_,socket) do
-
-
-  #   Phoenix.PubSub.subscribe(Gathering.PubSub, "req_id_default")
-  #   {:noreply,
-  #   socket
-  #   |> assign(:req_id, "default")}
-  # end
   def preload(list_of_assigns) do
     # IO.puts("PRELOAD DATA")
-    # IO.puts("----------------")
     # IO.inspect(list_of_assigns)
-    # IO.puts("----------------")
-    # IO.puts("")
 
     list_of_assigns
   end
 
   def mount(socket) do
     # IO.puts("MOUNT DATA")
-    # IO.puts("----------------")
     # IO.inspect(socket, structs: false)
-    # IO.puts("----------------")
-    # IO.puts("")
-    # session = socket.assigns.props["session"]
-    # Phoenix.PubSub.subscribe(Gathering.PubSub, "session_#{session}")
-    # |> assign(:session, session)
     {:ok, socket |> assign(:mounted, false)}
   end
 
@@ -59,8 +42,6 @@ defmodule GatheringWeb.NotesLiveComponent do
     |> assign(:notes, [payload | socket.assigns.notes])
     |> assign(:props, assigns) }
   end
-
-
 
   # update statement replaces parent send_update statemetn completely,
   # which merges props into state. perhaps sould update template to not pass
@@ -93,6 +74,7 @@ defmodule GatheringWeb.NotesLiveComponent do
       <label>Add a note</label>
       <form
         id="notes-form"
+        autocomplete="off"
         phx-change="update_text"
         phx-submit="submit_note"
         phx-target="<%= @myself %>">
