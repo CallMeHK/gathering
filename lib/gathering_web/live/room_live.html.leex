@@ -1,7 +1,12 @@
-<h1> Count <%= @count %></h1>
-<button phx-click="increment">+</button>
-<button  phx-click="decrement">-</button>
-
 <div>
+    <%= live_component @socket, GatheringWeb.SearchLiveComponent, session: @session, id: :search_component %>
+    <div style="display: flex; flex-wrap: wrap">
+        <%= for {_, card_name, scryfall_id} <- @cards do %>
+        <div>
+            <div style="width:200px"><img src="<%= "https://api.scryfall.com/cards/#{scryfall_id}?format=image" %>"></div>
+            <div><%= card_name%></div>
+        </div>
+        <% end %>
+    </div>
     <%= live_component @socket, GatheringWeb.NotesLiveComponent, session: @session, id: :notes_component %>
 </div>

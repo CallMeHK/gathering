@@ -8,7 +8,7 @@
 use Mix.Config
 
 config :gathering,
-  ecto_repos: [Gathering.Repo]
+  ecto_repos: [Gathering.Repo, Gathering.MTGRepo]
 
 # Configures the endpoint
 config :gathering, GatheringWeb.Endpoint,

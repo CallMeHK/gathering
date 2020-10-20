@@ -9,6 +9,7 @@ defmodule Gathering.Application do
     children = [
       # Start the Ecto repository
       Gathering.Repo,
+      Gathering.MTGRepo,
       # Start the Telemetry supervisor
       GatheringWeb.Telemetry,
       # Start the PubSub system

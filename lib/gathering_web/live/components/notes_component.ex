@@ -2,6 +2,7 @@ defmodule GatheringWeb.NotesLiveComponent do
   use Phoenix.LiveComponent
   # this alias allows us to use %Notes
   alias Gathering.Notes
+  # alias Gathering.MTGRepo
 
 
   def preload(list_of_assigns) do
@@ -61,7 +62,10 @@ defmodule GatheringWeb.NotesLiveComponent do
     _created_note = Notes.create_note(note, socket.assigns.session)
     session = socket.assigns.session
 
-    Phoenix.PubSub.broadcast(Gathering.PubSub, "session_#{session}", %{app_event: :note_added, cid: socket.assigns.props.id, payload: note})
+    # response = Gathering.Cards.match(note)
+    # IO.inspect(response, structs: false)
+
+    Phoenix.PubSub.broadcast(Gathering.PubSub, "session_#{session}", %{app_event: :note_added, cid: :notes_component, payload: note})
     {:noreply, socket |> assign(:text, "")}
   end
 
@@ -80,6 +84,7 @@ defmodule GatheringWeb.NotesLiveComponent do
         phx-target="<%= @myself %>">
         <input
           id="notes-input"
+          type="text"
           style="width:350px"
           name="note"
           value="<%= @text %>"

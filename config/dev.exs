@@ -10,6 +10,14 @@ config :gathering, Gathering.Repo,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
+config :gathering, Gathering.MTGRepo,
+  adapter: Ecto.Adapters.MyXQL,
+  database: "db",
+  username: "user",
+  password: "pass",
+  hostname: "localhost",
+  port: 3306
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #

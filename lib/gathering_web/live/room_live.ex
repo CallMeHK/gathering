@@ -13,7 +13,7 @@ defmodule GatheringWeb.RoomLive do
 
   def mount(_session, _, socket) do
     # socket = assign(socket, :count, 0)
-    {:ok, socket |> assign(:count, 0)}
+    {:ok, socket |> assign(:count, 0) |> assign(:cards, [])}
   end
 
   def handle_params(%{"session" => session},_,socket) do
@@ -24,7 +24,7 @@ defmodule GatheringWeb.RoomLive do
     |> assign(:session, session)}
   end
 
-  def handle_info(%{app_event: event, id: :notes_component, payload: payload}, socket)  do
+  def handle_info(%{app_event: event, cid: :notes_component, payload: payload}, socket)  do
     send_update(GatheringWeb.NotesLiveComponent,
       id: :notes_component,
       app_event: event,
@@ -32,6 +32,22 @@ defmodule GatheringWeb.RoomLive do
       session: socket.assigns.session)
     {:noreply, socket}
   end
+
+  def handle_info(%{app_event: :card_added, cid: :search_component, payload: payload}, socket)  do
+    IO.inspect(payload)
+    {:noreply, socket |> assign(:cards, [ payload | socket.assigns.cards])}
+  end
+
+  def handle_info(%{app_event: event, cid: :search_component, payload: payload}, socket)  do
+    send_update(GatheringWeb.SearchLiveComponent,
+      id: :search_component,
+      app_event: event,
+      payload: payload,
+      session: socket.assigns.session)
+    {:noreply, socket}
+  end
+
+
 
   def handle_info(%{count: count} = _, socket) do
     # send_update(GatheringWeb.NotesLiveComponent,
