@@ -13,11 +13,9 @@ defmodule GatheringWeb.RoomLive do
   alias Gathering.SessionCards
 
   def mount(%{"session" => session}, _, socket) do
-    # socket = assign(socket, :count, 0)
     session_cards = SessionCards.get_cards_by_session(session)
     IO.inspect session_cards
     {:ok, socket
-    |> assign(:count, 0)
     |> assign(:cards, session_cards )}
   end
 
@@ -56,8 +54,7 @@ defmodule GatheringWeb.RoomLive do
   end
 
   def handle_info(%{app_event: :card_removed, payload: id}, socket)  do
-    IO.puts "----------- CARD REMOVED EVENT -----------"
-    new_cards = Enum.reduce(socket.assigns.cards, fn ({card_id, _, _} = card, acc) ->
+    new_cards = Enum.reduce(socket.assigns.cards, [], fn ({card_id, _, _} = card, acc) ->
       case card_id do
         ^id -> acc
         _ -> List.flatten([acc, card])
