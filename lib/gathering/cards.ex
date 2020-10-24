@@ -26,6 +26,10 @@ defmodule Gathering.Cards do
     MTGRepo.all(query)
   end
 
+  def match_dedupe("" = _substring) do
+    []
+  end
+
   def match_dedupe(substring) do
     duped_matches = Gathering.Cards.match(substring)
     Enum.reduce duped_matches, [], fn({_, card_name, _} = elt, acc) ->

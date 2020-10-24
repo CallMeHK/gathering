@@ -10,10 +10,15 @@
 
 defmodule GatheringWeb.RoomLive do
   use Phoenix.LiveView
+  alias Gathering.SessionCards
 
-  def mount(_session, _, socket) do
+  def mount(%{"session" => session}, _, socket) do
     # socket = assign(socket, :count, 0)
-    {:ok, socket |> assign(:count, 0) |> assign(:cards, [])}
+    session_cards = SessionCards.get_cards_by_session(session)
+    IO.inspect session_cards
+    {:ok, socket
+    |> assign(:count, 0)
+    |> assign(:cards, session_cards )}
   end
 
   def handle_params(%{"session" => session},_,socket) do
@@ -25,6 +30,7 @@ defmodule GatheringWeb.RoomLive do
   end
 
   def handle_info(%{app_event: event, cid: :notes_component, payload: payload}, socket)  do
+
     send_update(GatheringWeb.NotesLiveComponent,
       id: :notes_component,
       app_event: event,
@@ -34,8 +40,10 @@ defmodule GatheringWeb.RoomLive do
   end
 
   def handle_info(%{app_event: :card_added, cid: :search_component, payload: payload}, socket)  do
-    IO.inspect(payload)
-    {:noreply, socket |> assign(:cards, [ payload | socket.assigns.cards])}
+    cards = List.flatten([ socket.assigns.cards, payload ])
+   {:noreply,
+    socket
+    |> assign(:cards, cards )}
   end
 
   def handle_info(%{app_event: event, cid: :search_component, payload: payload}, socket)  do
@@ -47,30 +55,29 @@ defmodule GatheringWeb.RoomLive do
     {:noreply, socket}
   end
 
+  def handle_info(%{app_event: :card_removed, payload: id}, socket)  do
+    IO.puts "----------- CARD REMOVED EVENT -----------"
+    new_cards = Enum.reduce(socket.assigns.cards, fn ({card_id, _, _} = card, acc) ->
+      case card_id do
+        ^id -> acc
+        _ -> List.flatten([acc, card])
+      end
+    end)
 
-
-  def handle_info(%{count: count} = _, socket) do
-    # send_update(GatheringWeb.NotesLiveComponent,
-    #   id: :notes_component,
-    #   app_event: :new_note,
-    #   payload: socket.assigns.count,
-    #   session: socket.assigns.session)
-    {:noreply, socket |> assign(:count, count)}
+    {:noreply, socket |> assign(:cards, new_cards)}
   end
 
-  def handle_event("increment", _, socket) do
-    count = socket.assigns.count + 1
-    socket = assign(socket, :count, count)
-    session = socket.assigns[:session]
-    Phoenix.PubSub.broadcast(Gathering.PubSub, "session_#{session}", %{event: "increment", count: count})
-    {:noreply, socket}
-  end
+  def handle_event("remove_card", %{"value" => id} = _assigns, socket) do
+    IO.puts "REMOVE_CARD"
+    session = socket.assigns.session
+    { int_id, _} = Integer.parse(id)
+    SessionCards.delete_card_by_id(int_id)
+    Phoenix.PubSub.broadcast(Gathering.PubSub,
+        "session_#{session}",
+        %{app_event: :card_removed,
+        payload: int_id
+      })
 
-  def handle_event("decrement", _, socket) do
-    count = socket.assigns.count - 1
-    socket = assign(socket, :count, count)
-    session = socket.assigns[:session]
-    Phoenix.PubSub.broadcast(Gathering.PubSub, "session_#{session}", %{event: "decrement", count: count})
     {:noreply, socket}
   end
 end
